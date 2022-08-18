@@ -1,0 +1,1 @@
+This repository contains the result of tuning centralized Federated Learning algorithm using [FedSim](fedsim.varnio.com).
