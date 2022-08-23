@@ -8,10 +8,15 @@ We got the best value with `lr=0.13`, therefore we relunch the experiment with t
 
 *Aug16_18-56-48_theBeans:* `fedsim-cli fed-learn --criterion CrossEntropyLoss log_freq:10 -n 1000 -d BasicDataManager num_partitions:1000 dataset:cifar100 rule:dir label_balance:0.3 root:../../../data/ save_dir:partitions -m cnn_cifar100 --batch-size 50 --test-batch-size 75 --global-score Accuracy log_freq:100 split:test --global-score CrossEntropyScore log_freq:100 split:test --epochs 5 --local-optimizer SGD weight_decay:0.001 lr:0.13 -r 10000`
 
+| :exclamation:  This is very important   |
+|-----------------------------------------|
+| The two experiments above are lunch with different fedsim versions. As a results the second uses no r2r learning decay by default while the first one uses an exponential one with gamma=0.999. This should be explained why the second is different (performing a bit better) |
+
+
 
 ## Fine-tune lr & gamma together
 
-By default we apply a StepLR scheduling (with gamma=0.999) to decay the round to round learning rate. In this experiment we jointly tune gamma with the local leanring rate.
+In this experiment we jointly tune gamma with the local leanring rate.
 
 `fedsim-cli fed-tune --criterion CrossEntropyLoss log_freq:10 -n 1000 -d BasicDataManager num_partitions:1000 dataset:cifar100 rule:dir label_balance:0.3 root:data/ save_dir:partitions -m cnn_cifar100 --batch-size 50 --test-batch-size 75 --global-score Accuracy log_freq:100 split:test --global-score CrossEntropyScore log_freq:100 split:test --epochs 5 --local-optimizer SGD weight_decay:0.001 lr:Real:0.04-0.15 --n-iters 20 --skopt-random-state 20 -r 2000 --r2r-local-lr-scheduler StepLR step_size:1 gamma:Real:0.98-0.9999`
 
@@ -29,4 +34,4 @@ The best values are again 0.15 and 1.0 for local learning rate and gamma, respec
 
 ## Final verdict
 
-Comparing the first long run (local lr=0.13, gamma=0.999) and the second one (local lr=0.15, gamma=1.0) may indicate that learning slower would eventually work better. We shall repeat the long run experiments for more number of seeds to confirm.
+Comparing the first long run (local lr=0.13, gamma=1.0) and the second one (local lr=0.15, gamma=1.0) may indicate that learning slower would eventually work better. We shall repeat the long run experiments for more number of seeds to confirm.
